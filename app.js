@@ -5,7 +5,7 @@ var express      = require('express'),
     bodyParser   = require("body-parser"),
     http         = require('http'),
     satellite    = require('./public/satellite/dist/satellite.js').satellite;
-    
+
 //0Configurations-------------------------------------------------------------->
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(express.static(__dirname));
@@ -34,7 +34,7 @@ var db = admin.database();
 //0Middleware------------------------------------------------------------------>
 
 //0Routes---------------------------------------------------------------------->
-//setInterval(convertSatelliteCoordinates(), 2000);
+//setInterval(getLandVehicles(), 2000);
 //setInterval(convertSatelliteCoordinates(), 2000);
 
 app.listen(process.env.PORT, process.env.IP, function(){
