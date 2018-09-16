@@ -34,41 +34,21 @@ var db = admin.database();
 //0Middleware------------------------------------------------------------------>
 
 //0Routes---------------------------------------------------------------------->
-// setInterval(getLandVehicles(), 7500);
-setInterval(convertSatelliteCoordinates(), 7500);
-
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("Server Started!");
 });
 
-function getLandVehicles(){
-  http.get("http://data.cincinnati-oh.gov/resource/w2ka-rfbi.json", function(res){
-    var body = '';
-    res.on('data', function(chunk){
-        body += chunk;
-    });
-    res.on('end', function(){
-        var resp = JSON.parse(body);
-        // console.log("Got a response: ", resp);
-        for(var key in resp){
-          if(resp.hasOwnProperty(key)){
-            var obj = resp[key];
-            var direction = getDirection(obj['heading']);
-            var data = {
-              direction : direction,
-              latitude : obj['latitude'],
-              longitude : obj['longitude']
-            }
-            db.ref('/land_vehicles/').update({[key] : data}).then(function(snapshot){
-            }, function(error){
-            });
-          }
-        }
-    });
-  }).on('error', function(e){
-        console.log("Got an error: ", e);
-  });
-}
+var interval;
+
+app.get('/', function(request, response){
+  interval = setInterval(addData, 7500);
+  response.send('set');
+});
+
+app.get('/cancel', function(request, response){
+  clearInterval(interval);
+  response.send('cancel');
+});
 
 function convertSatelliteCoordinates(){
   var currentDate = new Date();
@@ -91,8 +71,8 @@ function addData(){
           var tleArray = ['',''];
           tleArray[0] = satellites[key]['tle']['0'];
           tleArray[1] = satellites[key]['tle']['1'];
-          var satRec= getSatRec(tleArray);
-          db.ref('/satellites/' + key + '/').update({satRec : satRec}).then(function(snapshot){
+          var satRec = getSatRec(tleArray);
+           db.ref('/satellites/' + key + '/').update({'satRec' : satRec}).then(function(snapshot){
           }, function(error){
           });
         }
@@ -165,4 +145,23 @@ function getDirection(heading){
     default :
       return 'N';
   }
+}
+
+function deleteObjs(){
+  // db.ref('/land_vehicles').once('value').then(function(snapshot){
+  //     var satellites = snapshot.val();
+  //     var counter = 0;
+  //     for(var key in satellites){
+  //       if(satellites.hasOwnProperty(key)){
+  //         counter++;
+  //         if(counter >= 100){
+  //           db.ref('/land_vehicles/' + key).set({}).then(function(snapshot){
+  //             console.log('yuh');
+  //           }, function(error){
+  //           });
+  //         }
+  //       }
+  //     }
+  // }, function(error){
+  // });
 }
