@@ -34,8 +34,8 @@ var db = admin.database();
 //0Middleware------------------------------------------------------------------>
 
 //0Routes---------------------------------------------------------------------->
-//setInterval(getLandVehicles(), 2000);
-//setInterval(convertSatelliteCoordinates(), 2000);
+// setInterval(getLandVehicles(), 7500);
+setInterval(convertSatelliteCoordinates(), 7500);
 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("Server Started!");
@@ -106,43 +106,43 @@ function getSatRec(tleArray){
   var lng = '';
   var altitude = 0;
     
-    // Initialize a satellite record
-    var satrec = satellite.twoline2satrec(tleArray[0], tleArray[1]);
-    
-    //  Or you can use a JavaScript Date
-    var positionAndVelocity = satellite.propagate(satrec, new Date());
-    
-    // The position_velocity result is a key-value pair of ECI coordinates.
-    // These are the base results from which all other coordinates are derived.
-    var positionEci = positionAndVelocity.position,
-        velocityEci = positionAndVelocity.velocity;
-    
-    var deg2rad = Math.PI/180;
-    // Set the Observer at 122.03 West by 36.96 North, in RADIANS
-    var observerGd = {
-        longitude: -122.0308 * deg2rad,
-        latitude: 36.9613422 * deg2rad,
-        height: 0.370
-    };
-    
-    //You will need GMST for some of the coordinate transforms.
-    //http://en.wikipedia.org/wiki/Sidereal_time#Definition
-    var gmst = satellite.gstimeFromDate(new Date());
-    
-    //You can get ECF, Geodetic, Look Angles, and Doppler Factor.
-    var positionEcf   = satellite.eciToEcf(positionEci, gmst),
-        positionGd    = satellite.eciToGeodetic(positionEci, gmst);
-    
-    // Geodetic coords are accessed via `longitude`, `latitude`, `height`.
-    var longitude = positionGd.longitude,
-      latitude  = positionGd.latitude,
-      height    = positionGd.height;
-    
-    //  Convert the RADIANS to DEGREES for pretty printing (appends "N", "S", "E", "W", etc).
-    var longitudeStr = satellite.degreesLong(longitude),
-      latitudeStr  = satellite.degreesLat(latitude);
-       
-    return {latitude : latitudeStr, longitude : longitudeStr, altitude : height};
+  // Initialize a satellite record
+  var satrec = satellite.twoline2satrec(tleArray[0], tleArray[1]);
+  
+  //  Or you can use a JavaScript Date
+  var positionAndVelocity = satellite.propagate(satrec, new Date());
+  
+  // The position_velocity result is a key-value pair of ECI coordinates.
+  // These are the base results from which all other coordinates are derived.
+  var positionEci = positionAndVelocity.position,
+      velocityEci = positionAndVelocity.velocity;
+  
+  var deg2rad = Math.PI/180;
+  // Set the Observer at 122.03 West by 36.96 North, in RADIANS
+  var observerGd = {
+      longitude: -122.0308 * deg2rad,
+      latitude: 36.9613422 * deg2rad,
+      height: 0.370
+  };
+  
+  //You will need GMST for some of the coordinate transforms.
+  //http://en.wikipedia.org/wiki/Sidereal_time#Definition
+  var gmst = satellite.gstimeFromDate(new Date());
+  
+  //You can get ECF, Geodetic, Look Angles, and Doppler Factor.
+  var positionEcf   = satellite.eciToEcf(positionEci, gmst),
+      positionGd    = satellite.eciToGeodetic(positionEci, gmst);
+  
+  // Geodetic coords are accessed via `longitude`, `latitude`, `height`.
+  var longitude = positionGd.longitude,
+    latitude  = positionGd.latitude,
+    height    = positionGd.height;
+  
+  //  Convert the RADIANS to DEGREES for pretty printing (appends "N", "S", "E", "W", etc).
+  var longitudeStr = satellite.degreesLong(longitude),
+    latitudeStr  = satellite.degreesLat(latitude);
+     
+  return {latitude : latitudeStr, longitude : longitudeStr, altitude : height};
 }
 
 function getDateDifference(satellite_updated, currentDate){
